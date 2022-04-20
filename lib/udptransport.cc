@@ -369,7 +369,7 @@ UDPTransport::Register(TransportReceiver *receiver,
     receivers[fd] = receiver;
     fds[receiver] = fd;
 
-    Debug("Listening on UDP port %hu", ntohs(sin.sin_port));
+    Notice("Listening on UDP port %hu", ntohs(sin.sin_port));
 
     // If we are registering a replica, check whether we need to set
     // up a socket to listen on the multicast port.

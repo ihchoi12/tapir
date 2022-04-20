@@ -31,7 +31,7 @@ main(int argc, char **argv)
     const char *keysPath = NULL;
     int duration = 10;
     int nShards = 1;
-    int tLen = 10;
+    int tLen = 1;
     int wPer = 50; // Out of 100
     int closestReplica = -1; // Closest replica id.
     int skew = 0; // difference between real clock and TrueTime
@@ -282,8 +282,8 @@ main(int argc, char **argv)
 
         long latency = (t2.tv_sec - t1.tv_sec)*1000000 + (t2.tv_usec - t1.tv_usec);
 
-        fprintf(stderr, "%d %ld.%06ld %ld.%06ld %ld %d\n", nTransactions+1, t1.tv_sec,
-                t1.tv_usec, t2.tv_sec, t2.tv_usec, latency, status?1:0);
+        // fprintf(stderr, "%d %ld.%06ld %ld.%06ld %ld %d\n", nTransactions+1, t1.tv_sec,
+        //         t1.tv_usec, t2.tv_sec, t2.tv_usec, latency, status?1:0);
 
         if (status) {
             tCount++;
@@ -301,7 +301,7 @@ main(int argc, char **argv)
     fprintf(stderr, "# Begin: %d, %lf\n", beginCount, beginLatency/beginCount);
     fprintf(stderr, "# Get: %d, %lf\n", getCount, getLatency/getCount);
     fprintf(stderr, "# Put: %d, %lf\n", putCount, putLatency/putCount);
-    fprintf(stderr, "# Commit: %d, %lf\n", commitCount, commitLatency/commitCount);
+    fprintf(stderr, "# Commit: %d\n\n", commitCount);
     
     return 0;
 }

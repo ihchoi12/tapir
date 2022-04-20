@@ -49,7 +49,7 @@ class VRReplica : public Replica
 public:
     VRReplica(transport::Configuration config, int myIdx,
               Transport *transport, unsigned int batchSize,
-              AppReplica *app);
+              AppReplica *app, bool is_tss = false);
     ~VRReplica();
     
     void ReceiveMessage(const TransportAddress &remote,
@@ -66,6 +66,7 @@ private:
     proto::PrepareMessage lastPrepare;
     unsigned int batchSize;
     opnum_t lastBatchEnd;
+    bool is_tss;
     
     Log log;
     std::map<uint64_t, std::unique_ptr<TransportAddress> > clientAddresses;

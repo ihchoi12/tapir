@@ -51,13 +51,14 @@ using namespace proto;
     
 VRReplica::VRReplica(transport::Configuration config, int myIdx,
                      Transport *transport, unsigned int batchSize,
-                     AppReplica *app)
+                     AppReplica *app, bool is_tss)
     : Replica(config, myIdx, transport, app),
       batchSize(batchSize),
       log(false),
       prepareOKQuorum(config.QuorumSize()-1),
       startViewChangeQuorum(config.QuorumSize()-1),
-      doViewChangeQuorum(config.QuorumSize()-1)
+      doViewChangeQuorum(config.QuorumSize()-1),
+      is_tss(is_tss)
 {
     this->status = STATUS_NORMAL;
     this->view = 0;
@@ -81,7 +82,7 @@ VRReplica::VRReplica(transport::Configuration config, int myIdx,
             this->lastRequestStateTransferView = 0;
             this->lastRequestStateTransferOpnum = 0;            
         });
-    this->stateTransferTimeout->Start();
+    // this->stateTransferTimeout->Start();
     this->resendPrepareTimeout = new Timeout(transport, 500, [this]() {
             ResendPrepare();
         });
@@ -400,6 +401,20 @@ void
 VRReplica::HandleRequest(const TransportAddress &remote,
                          const RequestMessage &msg)
 {
+    if(is_tss){
+        lastCommitted++;
+        ReplyMessage reply;
+        Execute(lastCommitted, msg.req(), reply);
+
+        reply.set_view(this->view);
+        reply.set_opnum(lastCommitted);
+        reply.set_clientreqid(msg.req().clientreqid());
+
+        /* Send reply */
+        transport->SendMessage(this, remote, reply);
+        return;
+    }
+
     viewstamp_t v;
     
     if (status != STATUS_NORMAL) {
